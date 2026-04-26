@@ -325,6 +325,13 @@
     transition: width 0.35s ease;
   }
 
+  .price-note {
+    margin-top: 6px;
+    color: var(--muted);
+    font: 10px/1.5 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
   .range-hint,
   .helper {
     margin-top: 8px;
@@ -615,10 +622,12 @@
             <span class="unit">Rp/L</span>
           </div>
           <div class="chips" aria-label="Preset harga BBM">
-            <button class="chip" type="button" data-price="6800">Solar</button>
-            <button class="chip" type="button" data-price="10000">Dexlite</button>
-            <button class="chip" type="button" data-price="12950">Pertamax</button>
+            <button class="chip" type="button" data-price="6800">Solar 6.800</button>
+            <button class="chip" type="button" data-price="10000">Pertalite 10.000</button>
+            <button class="chip" type="button" data-price="23600">Dexlite 23.600</button>
+            <button class="chip" type="button" data-price="12600">Pertamax 12.600</button>
           </div>
+          <div class="price-note">Harga terkini per Apr 2025 · Ketuk chip untuk memilih</div>
         </div>
 
         <div class="input-group full">
@@ -691,6 +700,14 @@
             Estimasi dari range tersisa
           </div>
           <div class="result-val"><span id="resSisaLiter">—</span><span class="unit2">liter</span></div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Biaya per km</strong>
+            Efisiensi pengeluaran BBM
+          </div>
+          <div class="result-val"><span id="resBiayaKm">—</span><span class="unit2">Rp/km</span></div>
         </div>
 
         <div class="result-row">
@@ -834,6 +851,8 @@
     document.getElementById('resEmisi').textContent = result.emisi.toFixed(1);
     document.getElementById('resBiaya').textContent = formatRupiah(result.biaya);
     document.getElementById('resBiayaSub').textContent = `${result.volumeBulat} liter × ${formatRupiah(values.harga)}/L`;
+    const biayaPerKm = result.jarakIsi > 0 ? result.biaya / result.jarakIsi : 0;
+    document.getElementById('resBiayaKm').textContent = formatRupiah(biayaPerKm);
     document.getElementById('adviceBox').textContent = buildAdvice(result);
 
     lastResultText = [
@@ -842,6 +861,7 @@
       `Volume BBM: ${result.volumeBulat} L (${result.volumeExact.toFixed(2)} L tepat)`,
       `Sisa BBM: ${result.sisaLiter.toFixed(1)} L`,
       `Estimasi emisi: ${result.emisi.toFixed(1)} kg CO₂`,
+      `Biaya per km: ${formatRupiah(result.biaya / result.jarakIsi)}/km`,
       `Total biaya: ${formatRupiah(result.biaya)}`
     ].join('\n');
 
