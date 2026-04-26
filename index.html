@@ -731,7 +731,10 @@
   const DEFAULT_REMAINING_KM = '298';
   const DEFAULT_CONSUMPTION = '8.3';
   const DEFAULT_PRICE = '6800';
-  // Diesel CO₂ factor from common GHG conversion factors (~2.68 kg CO₂/liter); replace with an official Indonesian factor if required by policy.
+  const LOW_FUEL_THRESHOLD = 20;
+  const HIGH_FUEL_THRESHOLD = 70;
+  // Diesel CO₂ factor from UK Government GHG conversion factors (~2.68 kg CO₂/liter):
+  // https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025
   const DIESEL_CO2_FACTOR_KG_PER_LITER = 2.68;
   let lastResultText = '';
 
@@ -800,10 +803,10 @@
   }
 
   function buildAdvice(result) {
-    if (result.remainingPercentage <= 20) {
+    if (result.remainingPercentage <= LOW_FUEL_THRESHOLD) {
       return 'Prioritas isi BBM sekarang karena sisa kapasitas sudah rendah. Pembulatan liter membantu memberi cadangan aman.';
     }
-    if (result.remainingPercentage >= 70) {
+    if (result.remainingPercentage >= HIGH_FUEL_THRESHOLD) {
       return 'Sisa BBM masih aman. Pengisian bisa ditunda atau disesuaikan dengan rute operasional berikutnya.';
     }
     return 'Kondisi BBM cukup ideal. Gunakan estimasi biaya ini untuk menyiapkan anggaran perjalanan.';
@@ -867,7 +870,7 @@
       await navigator.clipboard.writeText(lastResultText);
       copyStatus.textContent = 'Rincian berhasil disalin ke clipboard.';
     } catch (error) {
-      copyStatus.textContent = 'Browser tidak mengizinkan salin otomatis. Silakan salin hasil secara manual.';
+      copyStatus.textContent = 'Browser tidak mengizinkan salin otomatis. Pastikan menggunakan HTTPS atau periksa izin browser.';
     }
   }
 
