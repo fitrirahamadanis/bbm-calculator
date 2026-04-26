@@ -733,9 +733,11 @@
   const DEFAULT_PRICE = '6800';
   const LOW_FUEL_THRESHOLD = 20;
   const HIGH_FUEL_THRESHOLD = 70;
-  // Diesel CO₂ factor based on 2025 UK Government GHG conversion factors (~2.68 kg CO₂/liter);
-  // verify against the latest local/official factor before using for formal reporting:
-  // https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025
+  /**
+   * Diesel CO₂ factor in kg CO₂ per liter, based on 2025 UK Government GHG conversion factors.
+   * Use a different factor for gasoline, biodiesel, or formal reports that require local standards:
+   * https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025
+   */
   const DIESEL_CO2_FACTOR_KG_PER_LITER = 2.68;
   let lastResultText = '';
 
