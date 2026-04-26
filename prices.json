@@ -5,6 +5,8 @@
     { "name": "Solar",     "price": 6800  },
     { "name": "Pertalite", "price": 10000 },
     { "name": "Dexlite",   "price": 23600 },
-    { "name": "Pertamax",  "price": 12600 }
+    { "name": "Dex", "price": 23900 },
+    { "name": "Pertamax",  "price": 12600 },
+    { "name": "Pertamax Turbo",  "price": 19600 }
   ]
 }
