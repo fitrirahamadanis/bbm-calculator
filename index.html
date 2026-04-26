@@ -580,7 +580,7 @@
         <div class="input-group">
           <label for="maxKm">Jarak maksimal tangki <span class="label-hint" aria-hidden="true">full tank</span></label>
           <div class="input-wrap">
-            <input type="number" id="maxKm" placeholder="550" value="550" min="1" inputmode="decimal">
+            <input type="number" id="maxKm" placeholder="550" min="1" inputmode="decimal">
             <span class="unit">km</span>
           </div>
         </div>
@@ -588,7 +588,7 @@
         <div class="input-group">
           <label for="sisaKm">Jarak sisa <span class="label-hint" aria-hidden="true">range tersisa</span></label>
           <div class="input-wrap">
-            <input type="number" id="sisaKm" placeholder="298" value="298" min="0" inputmode="decimal">
+            <input type="number" id="sisaKm" placeholder="298" min="0" inputmode="decimal">
             <span class="unit">km</span>
           </div>
           <div class="range-visual" aria-hidden="true"><div class="range-fill" id="rangeFill"></div></div>
@@ -598,12 +598,12 @@
         <div class="input-group">
           <label for="konsumsi">Konsumsi BBM <span class="label-hint" aria-hidden="true">liter per 100 km</span></label>
           <div class="input-wrap">
-            <input type="number" id="konsumsi" placeholder="8.3" value="8.3" min="0.1" step="0.1" inputmode="decimal">
+            <input type="number" id="konsumsi" placeholder="8.3" min="0.1" step="0.1" inputmode="decimal">
             <span class="unit">L/100km</span>
           </div>
           <div class="chips" aria-label="Preset konsumsi kendaraan">
             <button class="chip" type="button" data-consumption="2.5">Motor 2.5</button>
-            <button class="chip active" type="button" data-consumption="8.3">Mobil 8.3</button>
+            <button class="chip" type="button" data-consumption="8.3">Mobil 8.3</button>
             <button class="chip" type="button" data-consumption="14">Operasional 14</button>
           </div>
         </div>
@@ -611,11 +611,11 @@
         <div class="input-group">
           <label for="harga">Harga per liter <span class="label-hint" aria-hidden="true">rupiah</span></label>
           <div class="input-wrap">
-            <input type="number" id="harga" placeholder="6800" value="6800" min="1" inputmode="numeric">
+            <input type="number" id="harga" placeholder="6800" min="1" inputmode="numeric">
             <span class="unit">Rp/L</span>
           </div>
           <div class="chips" aria-label="Preset harga BBM">
-            <button class="chip active" type="button" data-price="6800">Solar</button>
+            <button class="chip" type="button" data-price="6800">Solar</button>
             <button class="chip" type="button" data-price="10000">Dexlite</button>
             <button class="chip" type="button" data-price="12950">Pertamax</button>
           </div>
@@ -727,7 +727,11 @@
   const errEl = document.getElementById('errorMsg');
   const resultCard = document.getElementById('resultCard');
   const copyStatus = document.getElementById('copyStatus');
-  // Approximate diesel CO₂ factor commonly used in fuel calculators; update if an official local factor is required.
+  const DEFAULT_MAX_KM = '550';
+  const DEFAULT_REMAINING_KM = '298';
+  const DEFAULT_CONSUMPTION = '8.3';
+  const DEFAULT_PRICE = '6800';
+  // Diesel CO₂ factor from common GHG conversion factors (~2.68 kg CO₂/liter); replace with an official Indonesian factor if required by policy.
   const DIESEL_CO2_FACTOR_KG_PER_LITER = 2.68;
   let lastResultText = '';
 
@@ -841,15 +845,15 @@
   }
 
   function resetForm() {
-    maxKmEl.value = '550';
-    sisaKmEl.value = '298';
-    konsumsiEl.value = '8.3';
-    hargaEl.value = '6800';
+    maxKmEl.value = DEFAULT_MAX_KM;
+    sisaKmEl.value = DEFAULT_REMAINING_KM;
+    konsumsiEl.value = DEFAULT_CONSUMPTION;
+    hargaEl.value = DEFAULT_PRICE;
     errEl.classList.remove('show');
     resultCard.classList.remove('show');
     copyStatus.textContent = '';
-    updateChips('[data-consumption]', 'consumption', '8.3');
-    updateChips('[data-price]', 'price', '6800');
+    updateChips('[data-consumption]', 'consumption', DEFAULT_CONSUMPTION);
+    updateChips('[data-price]', 'price', DEFAULT_PRICE);
     updateRange();
   }
 
@@ -899,7 +903,7 @@
     updateRange();
   });
 
-  updateRange();
+  resetForm();
 </script>
 </body>
 </html>
