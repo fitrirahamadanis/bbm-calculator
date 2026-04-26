@@ -325,6 +325,20 @@
     transition: width 0.35s ease;
   }
 
+  .price-note {
+    margin-top: 6px;
+    color: var(--muted);
+    font: 10px/1.5 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .price-loading {
+    color: var(--muted);
+    font: 12px 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+  }
+
   .range-hint,
   .helper {
     margin-top: 8px;
@@ -614,11 +628,10 @@
             <input type="number" id="harga" placeholder="6800" min="1" inputmode="numeric">
             <span class="unit">Rp/L</span>
           </div>
-          <div class="chips" aria-label="Preset harga BBM">
-            <button class="chip" type="button" data-price="6800">Solar</button>
-            <button class="chip" type="button" data-price="10000">Dexlite</button>
-            <button class="chip" type="button" data-price="12950">Pertamax</button>
+          <div class="chips" id="priceChips" aria-label="Preset harga BBM">
+            <span class="price-loading">Memuat harga…</span>
           </div>
+          <div class="price-note" id="priceNote">Memuat harga terkini…</div>
         </div>
 
         <div class="input-group full">
@@ -691,6 +704,14 @@
             Estimasi dari range tersisa
           </div>
           <div class="result-val"><span id="resSisaLiter">—</span><span class="unit2">liter</span></div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Biaya per km</strong>
+            Efisiensi pengeluaran BBM
+          </div>
+          <div class="result-val"><span id="resBiayaKm">—</span><span class="unit2">Rp/km</span></div>
         </div>
 
         <div class="result-row">
@@ -834,6 +855,8 @@
     document.getElementById('resEmisi').textContent = result.emisi.toFixed(1);
     document.getElementById('resBiaya').textContent = formatRupiah(result.biaya);
     document.getElementById('resBiayaSub').textContent = `${result.volumeBulat} liter × ${formatRupiah(values.harga)}/L`;
+    const biayaPerKm = result.jarakIsi > 0 ? result.biaya / result.jarakIsi : 0;
+    document.getElementById('resBiayaKm').textContent = formatRupiah(biayaPerKm);
     document.getElementById('adviceBox').textContent = buildAdvice(result);
 
     lastResultText = [
@@ -842,6 +865,7 @@
       `Volume BBM: ${result.volumeBulat} L (${result.volumeExact.toFixed(2)} L tepat)`,
       `Sisa BBM: ${result.sisaLiter.toFixed(1)} L`,
       `Estimasi emisi: ${result.emisi.toFixed(1)} kg CO₂`,
+      `Biaya per km: ${formatRupiah(result.biaya / result.jarakIsi)}/km`,
       `Total biaya: ${formatRupiah(result.biaya)}`
     ].join('\n');
 
@@ -885,13 +909,51 @@
     });
   });
 
-  document.querySelectorAll('[data-price]').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      hargaEl.value = chip.dataset.price;
-      updateChips('[data-price]', 'price', chip.dataset.price);
-      updateRange();
+  function attachPriceChipListeners() {
+    document.querySelectorAll('[data-price]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        hargaEl.value = chip.dataset.price;
+        updateChips('[data-price]', 'price', chip.dataset.price);
+        updateRange();
+      });
     });
-  });
+  }
+
+  function renderPriceChips(prices, updated, source) {
+    const container = document.getElementById('priceChips');
+    const note = document.getElementById('priceNote');
+    container.innerHTML = prices.map((item) =>
+      `<button class="chip" type="button" data-price="${item.price}">${item.name} ${Number(item.price).toLocaleString('id-ID')}</button>`
+    ).join('');
+    if (updated) {
+      const d = new Date(updated);
+      const fmt = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      note.textContent = `Diperbarui ${fmt}${source ? ' · ' + source : ''} · Ketuk chip untuk memilih`;
+    } else {
+      note.textContent = 'Ketuk chip untuk memilih';
+    }
+    attachPriceChipListeners();
+    updateChips('[data-price]', 'price', hargaEl.value);
+  }
+
+  const FALLBACK_PRICES = [
+    { name: 'Solar',     price: 6800  },
+    { name: 'Pertalite', price: 10000 },
+    { name: 'Dexlite',   price: 23600 },
+    { name: 'Pertamax',  price: 12600 }
+  ];
+
+  async function loadPrices() {
+    try {
+      const res = await fetch('./prices.json?_=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!Array.isArray(data.prices) || data.prices.length === 0) throw new Error('empty');
+      renderPriceChips(data.prices, data.updated, data.source);
+    } catch (_) {
+      renderPriceChips(FALLBACK_PRICES, null, null);
+    }
+  }
 
   [maxKmEl, sisaKmEl].forEach((input) => {
     input.addEventListener('input', () => {
@@ -910,6 +972,7 @@
   });
 
   resetForm();
+  loadPrices();
 </script>
 </body>
 </html>

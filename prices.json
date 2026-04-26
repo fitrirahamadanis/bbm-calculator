@@ -1,0 +1,10 @@
+{
+  "updated": "2025-04-26",
+  "source": "Pertamina",
+  "prices": [
+    { "name": "Solar",     "price": 6800  },
+    { "name": "Pertalite", "price": 10000 },
+    { "name": "Dexlite",   "price": 23600 },
+    { "name": "Pertamax",  "price": 12600 }
+  ]
+}
