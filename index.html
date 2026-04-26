@@ -238,6 +238,12 @@
     margin-bottom: 8px;
   }
 
+  .label-hint {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+  }
+
   .input-wrap { position: relative; }
 
   input[type="number"] {
@@ -507,6 +513,13 @@
     line-height: 1.6;
   }
 
+  .copy-status {
+    min-height: 20px;
+    margin-top: 12px;
+    color: var(--cyan);
+    font: 12px 'DM Mono', monospace;
+  }
+
   .footer {
     color: var(--muted);
     text-align: center;
@@ -565,7 +578,7 @@
 
       <div class="form-grid">
         <div class="input-group">
-          <label for="maxKm">Jarak maksimal tangki <span>full tank</span></label>
+          <label for="maxKm">Jarak maksimal tangki <span class="label-hint" aria-hidden="true">full tank</span></label>
           <div class="input-wrap">
             <input type="number" id="maxKm" placeholder="550" value="550" min="1" inputmode="decimal">
             <span class="unit">km</span>
@@ -573,7 +586,7 @@
         </div>
 
         <div class="input-group">
-          <label for="sisaKm">Jarak sisa <span>range tersisa</span></label>
+          <label for="sisaKm">Jarak sisa <span class="label-hint" aria-hidden="true">range tersisa</span></label>
           <div class="input-wrap">
             <input type="number" id="sisaKm" placeholder="298" value="298" min="0" inputmode="decimal">
             <span class="unit">km</span>
@@ -583,7 +596,7 @@
         </div>
 
         <div class="input-group">
-          <label for="konsumsi">Konsumsi BBM <span>liter per 100 km</span></label>
+          <label for="konsumsi">Konsumsi BBM <span class="label-hint" aria-hidden="true">liter per 100 km</span></label>
           <div class="input-wrap">
             <input type="number" id="konsumsi" placeholder="8.3" value="8.3" min="0.1" step="0.1" inputmode="decimal">
             <span class="unit">L/100km</span>
@@ -596,7 +609,7 @@
         </div>
 
         <div class="input-group">
-          <label for="harga">Harga per liter <span>rupiah</span></label>
+          <label for="harga">Harga per liter <span class="label-hint" aria-hidden="true">rupiah</span></label>
           <div class="input-wrap">
             <input type="number" id="harga" placeholder="6800" value="6800" min="1" inputmode="numeric">
             <span class="unit">Rp/L</span>
@@ -689,6 +702,7 @@
         </div>
 
         <div class="advice" id="adviceBox">—</div>
+        <div class="copy-status" id="copyStatus" aria-live="polite"></div>
 
         <div class="btn-row">
           <button class="btn" type="button" onclick="copyResult()">Salin Rincian</button>
@@ -712,6 +726,8 @@
   const gaugeHint = document.getElementById('gaugeHint');
   const errEl = document.getElementById('errorMsg');
   const resultCard = document.getElementById('resultCard');
+  const copyStatus = document.getElementById('copyStatus');
+  const SOLAR_CO2_FACTOR_KG_PER_LITER = 2.68; // Approximate CO₂ factor for diesel/solar fuel.
   let lastResultText = '';
 
   function formatRupiah(val) {
@@ -742,15 +758,15 @@
     const biaya = volumeBulat * values.harga;
     const kapasitasTangki = (values.maxKm / 100) * values.konsumsi;
     const sisaLiter = (values.sisaKm / 100) * values.konsumsi;
-    const emisi = volumeExact * 2.68;
+    const emisi = volumeExact * SOLAR_CO2_FACTOR_KG_PER_LITER;
     const pct = (values.sisaKm / values.maxKm) * 100;
 
     return { jarakIsi, volumeExact, volumeBulat, biaya, kapasitasTangki, sisaLiter, emisi, pct };
   }
 
-  function updateChips(groupSelector, activeValue) {
+  function updateChips(groupSelector, dataKey, activeValue) {
     document.querySelectorAll(groupSelector).forEach((chip) => {
-      chip.classList.toggle('active', chip.dataset.consumption === activeValue || chip.dataset.price === activeValue);
+      chip.classList.toggle('active', chip.dataset[dataKey] === activeValue);
     });
   }
 
@@ -819,6 +835,7 @@
     ].join('\n');
 
     resultCard.classList.add('show');
+    copyStatus.textContent = '';
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -829,26 +846,30 @@
     hargaEl.value = '6800';
     errEl.classList.remove('show');
     resultCard.classList.remove('show');
-    updateChips('[data-consumption]', '8.3');
-    updateChips('[data-price]', '6800');
+    copyStatus.textContent = '';
+    updateChips('[data-consumption]', 'consumption', '8.3');
+    updateChips('[data-price]', 'price', '6800');
     updateRange();
   }
 
   async function copyResult() {
-    if (!lastResultText) return;
+    if (!lastResultText) {
+      copyStatus.textContent = 'Hitung BBM terlebih dahulu sebelum menyalin rincian.';
+      return;
+    }
 
     try {
       await navigator.clipboard.writeText(lastResultText);
-      document.getElementById('adviceBox').textContent = 'Rincian berhasil disalin ke clipboard.';
+      copyStatus.textContent = 'Rincian berhasil disalin ke clipboard.';
     } catch (error) {
-      document.getElementById('adviceBox').textContent = 'Browser tidak mengizinkan salin otomatis. Silakan salin hasil secara manual.';
+      copyStatus.textContent = 'Browser tidak mengizinkan salin otomatis. Silakan salin hasil secara manual.';
     }
   }
 
   document.querySelectorAll('[data-consumption]').forEach((chip) => {
     chip.addEventListener('click', () => {
       konsumsiEl.value = chip.dataset.consumption;
-      updateChips('[data-consumption]', chip.dataset.consumption);
+      updateChips('[data-consumption]', 'consumption', chip.dataset.consumption);
       updateRange();
     });
   });
@@ -856,17 +877,25 @@
   document.querySelectorAll('[data-price]').forEach((chip) => {
     chip.addEventListener('click', () => {
       hargaEl.value = chip.dataset.price;
-      updateChips('[data-price]', chip.dataset.price);
+      updateChips('[data-price]', 'price', chip.dataset.price);
       updateRange();
     });
   });
 
-  [maxKmEl, sisaKmEl, konsumsiEl, hargaEl].forEach((input) => {
+  [maxKmEl, sisaKmEl].forEach((input) => {
     input.addEventListener('input', () => {
-      updateChips('[data-consumption]', konsumsiEl.value);
-      updateChips('[data-price]', hargaEl.value);
       updateRange();
     });
+  });
+
+  konsumsiEl.addEventListener('input', () => {
+    updateChips('[data-consumption]', 'consumption', konsumsiEl.value);
+    updateRange();
+  });
+
+  hargaEl.addEventListener('input', () => {
+    updateChips('[data-price]', 'price', hargaEl.value);
+    updateRange();
   });
 
   updateRange();
