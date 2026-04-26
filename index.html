@@ -4,111 +4,216 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalkulator BBM</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0d0f12;
-    --surface: #161a1f;
-    --card: #1c2128;
-    --border: #2a3140;
-    --accent: #f5a623;
-    --accent2: #e8410a;
-    --text: #e8eaf0;
-    --muted: #6b7585;
-    --success: #22c55e;
+    --bg: #08111f;
+    --bg-soft: #0e1b2d;
+    --surface: rgba(255, 255, 255, 0.08);
+    --surface-strong: rgba(255, 255, 255, 0.13);
+    --card: rgba(12, 23, 39, 0.82);
+    --card-solid: #101d31;
+    --border: rgba(255, 255, 255, 0.13);
+    --accent: #f8b84e;
+    --accent-strong: #f97316;
+    --cyan: #45d6ff;
+    --green: #4ade80;
+    --red: #fb7185;
+    --text: #f7fbff;
+    --muted: #9fb0c7;
+    --shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
   }
 
+  html { scroll-behavior: smooth; }
+
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(circle at top left, rgba(69, 214, 255, 0.16), transparent 34rem),
+      radial-gradient(circle at top right, rgba(249, 115, 22, 0.19), transparent 34rem),
+      linear-gradient(135deg, var(--bg), var(--bg-soft) 48%, #07101d);
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px;
+    padding: 32px 18px;
     overflow-x: hidden;
   }
 
-  /* Background texture */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(245,166,35,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(232,65,10,0.06) 0%, transparent 60%);
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 58px 58px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 78%);
     pointer-events: none;
-    z-index: 0;
   }
 
-  .wrapper {
-    width: 100%;
-    max-width: 480px;
+  .shell {
+    width: min(1120px, 100%);
+    margin: 0 auto;
     position: relative;
     z-index: 1;
   }
 
-  /* Header */
-  .header {
-    margin-bottom: 32px;
-    animation: fadeDown 0.6s ease both;
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+    gap: 22px;
+    align-items: stretch;
+    margin-bottom: 22px;
   }
 
-  .header .eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(42px, 12vw, 64px);
-    line-height: 0.9;
-    letter-spacing: 0.02em;
-    color: var(--text);
-  }
-
-  .header h1 span {
-    color: var(--accent);
-  }
-
-  .header .sub {
-    margin-top: 10px;
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 300;
-  }
-
-  /* Card */
-  .card {
+  .hero-panel,
+  .card,
+  .result-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 16px;
-    animation: fadeUp 0.5s ease both;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(22px);
   }
-  .card:nth-child(2) { animation-delay: 0.1s; }
-  .card:nth-child(3) { animation-delay: 0.2s; }
 
-  .card-label {
+  .hero-panel {
+    padding: clamp(28px, 5vw, 48px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-panel::after {
+    content: '';
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -78px;
+    bottom: -86px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(248, 184, 78, 0.34), transparent 68%);
+  }
+
+  .eyebrow,
+  .card-label,
+  .mini-label {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.14em;
-    color: var(--muted);
     text-transform: uppercase;
-    margin-bottom: 18px;
+  }
+
+  .eyebrow {
+    color: var(--cyan);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(54px, 9vw, 104px);
+    line-height: 0.86;
+    letter-spacing: 0.02em;
+    max-width: 640px;
+  }
+
+  h1 span {
+    background: linear-gradient(100deg, var(--accent), var(--accent-strong));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sub {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-top: 18px;
+  }
+
+  .hero-actions {
     display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 26px;
+  }
+
+  .pill {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 10px 13px;
   }
+
+  .dashboard-card {
+    padding: 24px;
+    display: grid;
+    align-content: space-between;
+    gap: 18px;
+  }
+
+  .gauge {
+    min-height: 210px;
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 50% 100%, rgba(248, 184, 78, 0.38), transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+    border: 1px solid var(--border);
+    padding: 26px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gauge::before {
+    content: '';
+    position: absolute;
+    inset: auto 24px 22px;
+    height: 88px;
+    border: 16px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 0;
+    border-radius: 120px 120px 0 0;
+  }
+
+  .gauge-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 0.9;
+    margin-top: 24px;
+  }
+
+  .gauge-value small {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.86fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .card,
+  .result-card {
+    padding: clamp(20px, 3vw, 30px);
+  }
+
+  .card-label {
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
   .card-label::after {
     content: '';
     flex: 1;
@@ -116,389 +221,695 @@
     background: var(--border);
   }
 
-  /* Input group */
-  .input-group {
-    margin-bottom: 16px;
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
   }
-  .input-group:last-child { margin-bottom: 0; }
+
+  .input-group.full { grid-column: 1 / -1; }
 
   label {
-    display: block;
-    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
     color: var(--muted);
-    margin-bottom: 6px;
-    font-weight: 400;
+    font-size: 13px;
+    margin-bottom: 8px;
   }
 
-  .input-wrap {
-    position: relative;
+  .label-hint {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
   }
+
+  .input-wrap { position: relative; }
 
   input[type="number"] {
     width: 100%;
-    background: var(--surface);
+    min-height: 54px;
+    background: rgba(5, 12, 24, 0.58);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 17px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    padding: 12px 52px 12px 16px;
+    font-size: 18px;
+    padding: 14px 76px 14px 16px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     -moz-appearance: textfield;
     appearance: textfield;
   }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
   input[type="number"]:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(245,166,35,0.12);
+    background: rgba(5, 12, 24, 0.82);
+    border-color: rgba(248, 184, 78, 0.85);
+    box-shadow: 0 0 0 4px rgba(248, 184, 78, 0.13);
   }
 
   .unit {
     position: absolute;
-    right: 14px;
+    right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 11px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
+    font-size: 12px;
     pointer-events: none;
   }
 
-  /* Progress bar jarak */
-  .range-visual {
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 10px;
-    background: var(--surface);
-    border-radius: 4px;
-    height: 4px;
-    overflow: hidden;
   }
+
+  .chip {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 8px 11px;
+    cursor: pointer;
+    font: 600 12px 'DM Sans', sans-serif;
+    transition: transform 0.2s, color 0.2s, border-color 0.2s, background 0.2s;
+  }
+
+  .chip:hover,
+  .chip.active {
+    color: var(--text);
+    border-color: rgba(248, 184, 78, 0.58);
+    background: rgba(248, 184, 78, 0.14);
+    transform: translateY(-1px);
+  }
+
+  .range-visual {
+    margin-top: 12px;
+    background: rgba(5, 12, 24, 0.64);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
   .range-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-    border-radius: 4px;
-    transition: width 0.4s ease;
     width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--accent), var(--green));
+    border-radius: 999px;
+    transition: width 0.35s ease;
   }
-  .range-hint {
-    margin-top: 5px;
-    font-size: 11px;
+
+  .range-hint,
+  .helper {
+    margin-top: 8px;
     color: var(--muted);
-    font-family: 'DM Mono', monospace;
+    font: 12px/1.5 'DM Mono', monospace;
   }
 
-  /* Button */
-  .btn {
-    width: 100%;
-    padding: 15px;
-    background: var(--accent);
-    color: #0d0f12;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
-    margin-top: 4px;
-    position: relative;
-    overflow: hidden;
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
   }
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(245,166,35,0.35);
-  }
-  .btn:active { transform: translateY(1px); }
 
-  /* Result card */
-  .result-card {
-    background: var(--card);
+  .mini-stat {
+    background: var(--surface);
     border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .mini-label { color: var(--muted); font-size: 9px; }
+
+  .mini-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0.03em;
+    margin-top: 6px;
+  }
+
+  .error-msg {
+    color: #fecdd3;
+    background: rgba(251, 113, 133, 0.12);
+    border: 1px solid rgba(251, 113, 133, 0.25);
     border-radius: 16px;
-    padding: 28px;
-    animation: fadeUp 0.4s ease both;
+    font-size: 13px;
+    line-height: 1.45;
+    padding: 12px 14px;
+    margin-top: 16px;
     display: none;
   }
-  .result-card.show { display: block; }
+
+  .error-msg.show { display: block; }
+
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .btn,
+  .secondary-btn {
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: transform 0.16s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .btn {
+    min-height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: #111827;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    box-shadow: 0 16px 36px rgba(249, 115, 22, 0.28);
+  }
+
+  .secondary-btn {
+    min-width: 56px;
+    padding: 0 17px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-weight: 700;
+  }
+
+  .btn:hover,
+  .secondary-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn:active,
+  .secondary-btn:active {
+    transform: translateY(0);
+  }
+
+  .result-card {
+    position: sticky;
+    top: 20px;
+  }
+
+  .empty-state {
+    color: var(--muted);
+    line-height: 1.7;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 22px;
+    padding: 22px;
+  }
+
+  .results { display: none; }
+  .result-card.show .empty-state { display: none; }
+  .result-card.show .results { display: block; }
+
+  .result-highlight {
+    background:
+      radial-gradient(circle at top right, rgba(69, 214, 255, 0.16), transparent 50%),
+      linear-gradient(135deg, rgba(248, 184, 78, 0.16), rgba(249, 115, 22, 0.1));
+    border: 1px solid rgba(248, 184, 78, 0.28);
+    border-radius: 24px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .big-label {
+    color: var(--muted);
+    font: 11px 'DM Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .big-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 70px);
+    line-height: 0.92;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+
+  .big-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 8px;
+  }
 
   .result-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    padding: 14px 0;
+    gap: 16px;
+    padding: 15px 0;
     border-bottom: 1px solid var(--border);
   }
-  .result-row:last-of-type { border-bottom: none; }
+
+  .result-row:last-child { border-bottom: none; }
 
   .result-key {
-    font-size: 12px;
     color: var(--muted);
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.45;
   }
+
   .result-key strong {
     display: block;
-    font-size: 13px;
     color: var(--text);
-    font-weight: 500;
-    margin-bottom: 2px;
+    font-size: 14px;
+    margin-bottom: 3px;
   }
 
   .result-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 0.04em;
     color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 31px;
+    letter-spacing: 0.04em;
     text-align: right;
+    white-space: nowrap;
   }
-  .result-val .unit2 {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
+
+  .unit2 {
     color: var(--muted);
     display: block;
-    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
     margin-top: -2px;
   }
 
-  .result-highlight {
-    background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(232,65,10,0.08));
-    border: 1px solid rgba(245,166,35,0.25);
-    border-radius: 12px;
-    padding: 20px;
+  .advice {
     margin-top: 16px;
-    text-align: center;
-  }
-  .result-highlight .big-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .result-highlight .big-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    color: var(--accent);
-    line-height: 1;
-    letter-spacing: 0.04em;
-  }
-  .result-highlight .big-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* Reset */
-  .reset-btn {
-    width: 100%;
-    padding: 11px;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
+    border-radius: 20px;
+    padding: 16px;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.22);
+    color: #dcfce7;
     font-size: 13px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: color 0.2s, border-color 0.2s;
+    line-height: 1.6;
   }
-  .reset-btn:hover { color: var(--text); border-color: var(--muted); }
 
-  /* Footer */
+  .copy-status {
+    min-height: 20px;
+    margin-top: 12px;
+    color: var(--cyan);
+    font: 12px 'DM Mono', monospace;
+  }
+
   .footer {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 11px;
     color: var(--muted);
-    font-family: 'DM Mono', monospace;
+    text-align: center;
+    margin-top: 26px;
+    font: 11px 'DM Mono', monospace;
     letter-spacing: 0.08em;
-    animation: fadeUp 0.5s ease 0.3s both;
   }
 
-  /* Animations */
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+  @media (max-width: 900px) {
+    .hero,
+    .main-grid { grid-template-columns: 1fr; }
+    .result-card { position: static; }
   }
 
-  /* Error */
-  .error-msg {
-    color: #f87171;
-    font-size: 12px;
-    margin-top: 6px;
-    display: none;
+  @media (max-width: 620px) {
+    body { padding: 18px 12px; }
+    .hero-panel,
+    .card,
+    .result-card,
+    .dashboard-card { border-radius: 24px; }
+    .form-grid,
+    .summary-strip { grid-template-columns: 1fr; }
+    .btn-row { grid-template-columns: 1fr; }
+    .secondary-btn { min-height: 48px; }
+    .result-row { align-items: flex-start; }
   }
-  .error-msg.show { display: block; }
 </style>
 </head>
 <body>
-
-<div class="wrapper">
-
-  <div class="header">
-    <div class="eyebrow">⛽ Fuel Planner</div>
-    <h1>KALKULATOR<br><span>BBM</span></h1>
-    <p class="sub">Hitung kebutuhan solar berdasarkan jarak & efisiensi kendaraan</p>
-  </div>
-
-  <div class="card" id="inputCard">
-    <div class="card-label">Parameter Kendaraan</div>
-
-    <div class="input-group">
-      <label>Jarak Maksimal Tangki</label>
-      <div class="input-wrap">
-        <input type="number" id="maxKm" placeholder="550" value="550" min="1">
-        <span class="unit">km</span>
+<main class="shell">
+  <section class="hero" aria-labelledby="pageTitle">
+    <div class="hero-panel">
+      <div class="eyebrow">⛽ Smart Fuel Planner</div>
+      <h1 id="pageTitle">Kalkulator <span>BBM</span> Modern</h1>
+      <p class="sub">Rencanakan kebutuhan BBM, estimasi biaya, sisa liter, dan rekomendasi pengisian dalam satu tampilan yang cepat dibaca.</p>
+      <div class="hero-actions" aria-label="Keunggulan aplikasi">
+        <span class="pill">⚡ Hitung instan</span>
+        <span class="pill">📊 Ringkasan biaya</span>
+        <span class="pill">🧭 Siap perjalanan</span>
       </div>
     </div>
 
-    <div class="input-group">
-      <label>Jarak Sisa (odometer tersisa)</label>
-      <div class="input-wrap">
-        <input type="number" id="sisaKm" placeholder="298" value="298" min="0">
-        <span class="unit">km</span>
+    <aside class="hero-panel dashboard-card" aria-label="Ringkasan kapasitas">
+      <div class="gauge">
+        <div class="mini-label">Sisa kapasitas</div>
+        <div class="gauge-value"><span id="gaugePct">0</span><small>%</small></div>
+        <p class="helper" id="gaugeHint">Masukkan data kendaraan untuk melihat kondisi tangki.</p>
       </div>
-      <div class="range-visual"><div class="range-fill" id="rangeFill"></div></div>
-      <div class="range-hint" id="rangeHint">—</div>
-    </div>
+      <div class="pill">💡 Tip: gunakan angka dari MID/odometer agar hasil lebih akurat.</div>
+    </aside>
+  </section>
 
-    <div class="input-group">
-      <label>Konsumsi BBM (per 100 km)</label>
-      <div class="input-wrap">
-        <input type="number" id="konsumsi" placeholder="8.3" value="8.3" min="0.1" step="0.1">
-        <span class="unit">L/100km</span>
+  <section class="main-grid">
+    <div class="card" id="inputCard">
+      <div class="card-label">Parameter Kendaraan</div>
+
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="maxKm">Jarak maksimal tangki <span class="label-hint" aria-hidden="true">full tank</span></label>
+          <div class="input-wrap">
+            <input type="number" id="maxKm" placeholder="550" min="1" inputmode="decimal">
+            <span class="unit">km</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="sisaKm">Jarak sisa <span class="label-hint" aria-hidden="true">range tersisa</span></label>
+          <div class="input-wrap">
+            <input type="number" id="sisaKm" placeholder="298" min="0" inputmode="decimal">
+            <span class="unit">km</span>
+          </div>
+          <div class="range-visual" aria-hidden="true"><div class="range-fill" id="rangeFill"></div></div>
+          <div class="range-hint" id="rangeHint">—</div>
+        </div>
+
+        <div class="input-group">
+          <label for="konsumsi">Konsumsi BBM <span class="label-hint" aria-hidden="true">liter per 100 km</span></label>
+          <div class="input-wrap">
+            <input type="number" id="konsumsi" placeholder="8.3" min="0.1" step="0.1" inputmode="decimal">
+            <span class="unit">L/100km</span>
+          </div>
+          <div class="chips" aria-label="Preset konsumsi kendaraan">
+            <button class="chip" type="button" data-consumption="2.5">Motor 2.5</button>
+            <button class="chip" type="button" data-consumption="8.3">Mobil 8.3</button>
+            <button class="chip" type="button" data-consumption="14">Operasional 14</button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="harga">Harga per liter <span class="label-hint" aria-hidden="true">rupiah</span></label>
+          <div class="input-wrap">
+            <input type="number" id="harga" placeholder="6800" min="1" inputmode="numeric">
+            <span class="unit">Rp/L</span>
+          </div>
+          <div class="chips" aria-label="Preset harga BBM">
+            <button class="chip" type="button" data-price="6800">Solar</button>
+            <button class="chip" type="button" data-price="10000">Dexlite</button>
+            <button class="chip" type="button" data-price="12950">Pertamax</button>
+          </div>
+        </div>
+
+        <div class="input-group full">
+          <div class="summary-strip" aria-label="Preview estimasi">
+            <div class="mini-stat">
+              <div class="mini-label">Perlu diisi</div>
+              <div class="mini-value" id="previewKm">—</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-label">Estimasi liter</div>
+              <div class="mini-value" id="previewLiter">—</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-label">Estimasi biaya</div>
+              <div class="mini-value" id="previewCost">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="errorMsg">⚠ Pastikan semua nilai valid, lebih dari nol, dan jarak sisa tidak melebihi jarak maksimal tangki.</div>
+
+      <div class="btn-row">
+        <button class="btn" type="button" onclick="hitung()">Hitung BBM</button>
+        <button class="secondary-btn" type="button" onclick="resetForm()" aria-label="Reset form">Reset</button>
       </div>
     </div>
 
-    <div class="input-group">
-      <label>Harga Per Liter</label>
-      <div class="input-wrap">
-        <input type="number" id="harga" placeholder="6800" value="6800" min="1">
-        <span class="unit">Rp/L</span>
+    <aside class="result-card" id="resultCard" aria-live="polite">
+      <div class="card-label">Hasil Kalkulasi</div>
+
+      <div class="empty-state">
+        Isi parameter kendaraan lalu tekan <strong>Hitung BBM</strong>. Hasil akan menampilkan total biaya, liter yang dibutuhkan, sisa BBM, dan rekomendasi singkat.
       </div>
-    </div>
 
-    <div class="error-msg" id="errorMsg">⚠ Pastikan semua nilai valid dan jarak sisa tidak melebihi maksimal.</div>
+      <div class="results">
+        <div class="result-highlight">
+          <div class="big-label">Total Biaya</div>
+          <div class="big-val" id="resBiaya">—</div>
+          <div class="big-sub" id="resBiayaSub">—</div>
+        </div>
 
-    <button class="btn" onclick="hitung()">HITUNG KEBUTUHAN BBM</button>
-  </div>
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Jarak Perlu Diisi</strong>
+            Maksimal − sisa range
+          </div>
+          <div class="result-val"><span id="resJarak">—</span><span class="unit2">km</span></div>
+        </div>
 
-  <div class="result-card" id="resultCard">
-    <div class="card-label">Hasil Kalkulasi</div>
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Volume BBM</strong>
+            Dibulatkan ke atas
+          </div>
+          <div class="result-val"><span id="resVolume">—</span><span class="unit2">liter</span></div>
+        </div>
 
-    <div class="result-row">
-      <div class="result-key">
-        <strong>Jarak Perlu Diisi</strong>
-        Maksimal − Sisa
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Volume Tepat</strong>
+            Tanpa pembulatan
+          </div>
+          <div class="result-val"><span id="resVolumeExact">—</span><span class="unit2">liter</span></div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Sisa BBM</strong>
+            Estimasi dari range tersisa
+          </div>
+          <div class="result-val"><span id="resSisaLiter">—</span><span class="unit2">liter</span></div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-key">
+            <strong>Estimasi Emisi</strong>
+            Perkiraan CO₂ perjalanan
+          </div>
+          <div class="result-val"><span id="resEmisi">—</span><span class="unit2">kg CO₂</span></div>
+        </div>
+
+        <div class="advice" id="adviceBox">—</div>
+        <div class="copy-status" id="copyStatus" aria-live="polite"></div>
+
+        <div class="btn-row">
+          <button class="btn" type="button" onclick="copyResult()">Salin Rincian</button>
+          <button class="secondary-btn" type="button" onclick="resetForm()">Ulangi</button>
+        </div>
       </div>
-      <div class="result-val" id="resJarak">—<span class="unit2">km</span></div>
-    </div>
-
-    <div class="result-row">
-      <div class="result-key">
-        <strong>Volume BBM</strong>
-        Dibulatkan ke atas
-      </div>
-      <div class="result-val" id="resVolume">—<span class="unit2">liter</span></div>
-    </div>
-
-    <div class="result-row">
-      <div class="result-key">
-        <strong>Volume Tepat</strong>
-        Tanpa pembulatan
-      </div>
-      <div class="result-val" id="resVolumeExact">—<span class="unit2">liter</span></div>
-    </div>
-
-    <div class="result-highlight">
-      <div class="big-label">Total Biaya</div>
-      <div class="big-val" id="resBiaya">—</div>
-      <div class="big-sub" id="resBiayaSub"></div>
-    </div>
-
-    <button class="reset-btn" onclick="reset()">← Hitung Ulang</button>
-  </div>
+    </aside>
+  </section>
 
   <div class="footer">DPRKPCK Jawa Timur · Bidang Air Minum & PLP</div>
-
-</div>
+</main>
 
 <script>
   const maxKmEl = document.getElementById('maxKm');
   const sisaKmEl = document.getElementById('sisaKm');
+  const konsumsiEl = document.getElementById('konsumsi');
+  const hargaEl = document.getElementById('harga');
   const rangeFill = document.getElementById('rangeFill');
   const rangeHint = document.getElementById('rangeHint');
-
-  function updateRange() {
-    const max = parseFloat(maxKmEl.value) || 0;
-    const sisa = parseFloat(sisaKmEl.value) || 0;
-    if (max > 0 && sisa >= 0 && sisa <= max) {
-      const pct = (sisa / max) * 100;
-      rangeFill.style.width = pct + '%';
-      const isi = max - sisa;
-      rangeHint.textContent = `Perlu mengisi ${isi.toFixed(0)} km · Sisa ${pct.toFixed(0)}% kapasitas`;
-    } else {
-      rangeFill.style.width = '0%';
-      rangeHint.textContent = '—';
-    }
-  }
-
-  maxKmEl.addEventListener('input', updateRange);
-  sisaKmEl.addEventListener('input', updateRange);
-  updateRange();
+  const gaugePct = document.getElementById('gaugePct');
+  const gaugeHint = document.getElementById('gaugeHint');
+  const errEl = document.getElementById('errorMsg');
+  const resultCard = document.getElementById('resultCard');
+  const copyStatus = document.getElementById('copyStatus');
+  const DEFAULT_MAX_KM = '550';
+  const DEFAULT_REMAINING_KM = '298';
+  const DEFAULT_CONSUMPTION = '8.3';
+  const DEFAULT_PRICE = '6800';
+  const LOW_FUEL_THRESHOLD = 20;
+  const HIGH_FUEL_THRESHOLD = 70;
+  /**
+   * Diesel CO₂ factor in kg CO₂ per liter, based on 2025 UK Government GHG conversion factors.
+   * Use a different factor for gasoline, biodiesel, or formal reports that require local standards:
+   * https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025
+   */
+  const DIESEL_CO2_FACTOR_KG_PER_LITER = 2.68;
+  let lastResultText = '';
 
   function formatRupiah(val) {
     return 'Rp' + Math.round(val).toLocaleString('id-ID');
   }
 
-  function hitung() {
-    const maxKm = parseFloat(maxKmEl.value);
-    const sisaKm = parseFloat(sisaKmEl.value);
-    const konsumsi = parseFloat(document.getElementById('konsumsi').value);
-    const harga = parseFloat(document.getElementById('harga').value);
-    const errEl = document.getElementById('errorMsg');
+  function getValues() {
+    return {
+      maxKm: parseFloat(maxKmEl.value),
+      sisaKm: parseFloat(sisaKmEl.value),
+      konsumsi: parseFloat(konsumsiEl.value),
+      harga: parseFloat(hargaEl.value)
+    };
+  }
 
-    if (!maxKm || !konsumsi || !harga || isNaN(sisaKm) || sisaKm < 0 || sisaKm > maxKm) {
-      errEl.classList.add('show');
+  function isValid(values) {
+    return values.maxKm > 0 &&
+      values.sisaKm >= 0 &&
+      values.sisaKm <= values.maxKm &&
+      values.konsumsi > 0 &&
+      values.harga > 0;
+  }
+
+  function calculate(values) {
+    const jarakIsi = values.maxKm - values.sisaKm;
+    const volumeExact = (jarakIsi / 100) * values.konsumsi;
+    const volumeBulat = Math.ceil(volumeExact);
+    const biaya = volumeBulat * values.harga;
+    const kapasitasTangki = (values.maxKm / 100) * values.konsumsi;
+    const sisaLiter = (values.sisaKm / 100) * values.konsumsi;
+    const emisi = volumeExact * DIESEL_CO2_FACTOR_KG_PER_LITER;
+    const remainingPercentage = (values.sisaKm / values.maxKm) * 100;
+
+    return { jarakIsi, volumeExact, volumeBulat, biaya, kapasitasTangki, sisaLiter, emisi, remainingPercentage };
+  }
+
+  function updateChips(groupSelector, dataKey, activeValue) {
+    document.querySelectorAll(groupSelector).forEach((chip) => {
+      chip.classList.toggle('active', chip.dataset[dataKey] === activeValue);
+    });
+  }
+
+  function updateRange() {
+    const values = getValues();
+
+    if (!isValid(values)) {
+      rangeFill.style.width = '0%';
+      rangeHint.textContent = 'Lengkapi data untuk menampilkan estimasi.';
+      gaugePct.textContent = '0';
+      gaugeHint.textContent = 'Masukkan data kendaraan untuk melihat kondisi tangki.';
+      document.getElementById('previewKm').textContent = '—';
+      document.getElementById('previewLiter').textContent = '—';
+      document.getElementById('previewCost').textContent = '—';
       return;
     }
-    errEl.classList.remove('show');
 
-    const jarakIsi = maxKm - sisaKm;
-    const volumeExact = (jarakIsi / 100) * konsumsi;
-    const volumeBulat = Math.ceil(volumeExact);
-    const biaya = volumeBulat * harga;
-
-    document.getElementById('resJarak').innerHTML = jarakIsi.toFixed(0) + '<span class="unit2">km</span>';
-    document.getElementById('resVolume').innerHTML = volumeBulat + '<span class="unit2">liter</span>';
-    document.getElementById('resVolumeExact').innerHTML = volumeExact.toFixed(2) + '<span class="unit2">liter</span>';
-    document.getElementById('resBiaya').textContent = formatRupiah(biaya);
-    document.getElementById('resBiayaSub').textContent = volumeBulat + ' liter × ' + formatRupiah(harga) + '/L';
-
-    document.getElementById('inputCard').style.display = 'none';
-    const rc = document.getElementById('resultCard');
-    rc.classList.add('show');
-    rc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const result = calculate(values);
+    rangeFill.style.width = result.remainingPercentage + '%';
+    rangeHint.textContent = `Perlu mengisi ${result.jarakIsi.toFixed(0)} km · Sisa ${result.remainingPercentage.toFixed(0)}% kapasitas`;
+    gaugePct.textContent = result.remainingPercentage.toFixed(0);
+    gaugeHint.textContent = `Perkiraan kapasitas tangki ${result.kapasitasTangki.toFixed(1)} L, sisa ${result.sisaLiter.toFixed(1)} L.`;
+    document.getElementById('previewKm').textContent = result.jarakIsi.toFixed(0) + ' km';
+    document.getElementById('previewLiter').textContent = result.volumeBulat + ' L';
+    document.getElementById('previewCost').textContent = formatRupiah(result.biaya);
   }
 
-  function reset() {
-    document.getElementById('inputCard').style.display = 'block';
-    document.getElementById('resultCard').classList.remove('show');
+  function buildAdvice(result) {
+    if (result.remainingPercentage <= LOW_FUEL_THRESHOLD) {
+      return 'Prioritas isi BBM sekarang karena sisa kapasitas sudah rendah. Pembulatan liter membantu memberi cadangan aman.';
+    }
+    if (result.remainingPercentage >= HIGH_FUEL_THRESHOLD) {
+      return 'Sisa BBM masih aman. Pengisian bisa ditunda atau disesuaikan dengan rute operasional berikutnya.';
+    }
+    return 'Kondisi BBM cukup ideal. Gunakan estimasi biaya ini untuk menyiapkan anggaran perjalanan.';
+  }
+
+  function hitung() {
+    const values = getValues();
+
+    if (!isValid(values)) {
+      errEl.classList.add('show');
+      resultCard.classList.remove('show');
+      return;
+    }
+
+    errEl.classList.remove('show');
+    const result = calculate(values);
+
+    document.getElementById('resJarak').textContent = result.jarakIsi.toFixed(0);
+    document.getElementById('resVolume').textContent = result.volumeBulat;
+    document.getElementById('resVolumeExact').textContent = result.volumeExact.toFixed(2);
+    document.getElementById('resSisaLiter').textContent = result.sisaLiter.toFixed(1);
+    document.getElementById('resEmisi').textContent = result.emisi.toFixed(1);
+    document.getElementById('resBiaya').textContent = formatRupiah(result.biaya);
+    document.getElementById('resBiayaSub').textContent = `${result.volumeBulat} liter × ${formatRupiah(values.harga)}/L`;
+    document.getElementById('adviceBox').textContent = buildAdvice(result);
+
+    lastResultText = [
+      'Rincian Kalkulator BBM',
+      `Jarak perlu diisi: ${result.jarakIsi.toFixed(0)} km`,
+      `Volume BBM: ${result.volumeBulat} L (${result.volumeExact.toFixed(2)} L tepat)`,
+      `Sisa BBM: ${result.sisaLiter.toFixed(1)} L`,
+      `Estimasi emisi: ${result.emisi.toFixed(1)} kg CO₂`,
+      `Total biaya: ${formatRupiah(result.biaya)}`
+    ].join('\n');
+
+    resultCard.classList.add('show');
+    copyStatus.textContent = '';
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetForm() {
+    maxKmEl.value = DEFAULT_MAX_KM;
+    sisaKmEl.value = DEFAULT_REMAINING_KM;
+    konsumsiEl.value = DEFAULT_CONSUMPTION;
+    hargaEl.value = DEFAULT_PRICE;
+    errEl.classList.remove('show');
+    resultCard.classList.remove('show');
+    copyStatus.textContent = '';
+    updateChips('[data-consumption]', 'consumption', DEFAULT_CONSUMPTION);
+    updateChips('[data-price]', 'price', DEFAULT_PRICE);
     updateRange();
   }
+
+  async function copyResult() {
+    if (!lastResultText) {
+      copyStatus.textContent = 'Hitung BBM terlebih dahulu sebelum menyalin rincian.';
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(lastResultText);
+      copyStatus.textContent = 'Rincian berhasil disalin ke clipboard.';
+    } catch (error) {
+      copyStatus.textContent = 'Gagal menyalin. Silakan salin teks secara manual atau coba lagi.';
+    }
+  }
+
+  document.querySelectorAll('[data-consumption]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      konsumsiEl.value = chip.dataset.consumption;
+      updateChips('[data-consumption]', 'consumption', chip.dataset.consumption);
+      updateRange();
+    });
+  });
+
+  document.querySelectorAll('[data-price]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      hargaEl.value = chip.dataset.price;
+      updateChips('[data-price]', 'price', chip.dataset.price);
+      updateRange();
+    });
+  });
+
+  [maxKmEl, sisaKmEl].forEach((input) => {
+    input.addEventListener('input', () => {
+      updateRange();
+    });
+  });
+
+  konsumsiEl.addEventListener('input', () => {
+    updateChips('[data-consumption]', 'consumption', konsumsiEl.value);
+    updateRange();
+  });
+
+  hargaEl.addEventListener('input', () => {
+    updateChips('[data-price]', 'price', hargaEl.value);
+    updateRange();
+  });
+
+  resetForm();
 </script>
 </body>
 </html>
