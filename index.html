@@ -727,7 +727,8 @@
   const errEl = document.getElementById('errorMsg');
   const resultCard = document.getElementById('resultCard');
   const copyStatus = document.getElementById('copyStatus');
-  const SOLAR_CO2_FACTOR_KG_PER_LITER = 2.68; // Approximate CO₂ factor for diesel/solar fuel.
+  // Approximate diesel CO₂ factor commonly used in fuel calculators; update if an official local factor is required.
+  const DIESEL_CO2_FACTOR_KG_PER_LITER = 2.68;
   let lastResultText = '';
 
   function formatRupiah(val) {
@@ -758,10 +759,10 @@
     const biaya = volumeBulat * values.harga;
     const kapasitasTangki = (values.maxKm / 100) * values.konsumsi;
     const sisaLiter = (values.sisaKm / 100) * values.konsumsi;
-    const emisi = volumeExact * SOLAR_CO2_FACTOR_KG_PER_LITER;
-    const pct = (values.sisaKm / values.maxKm) * 100;
+    const emisi = volumeExact * DIESEL_CO2_FACTOR_KG_PER_LITER;
+    const remainingPercentage = (values.sisaKm / values.maxKm) * 100;
 
-    return { jarakIsi, volumeExact, volumeBulat, biaya, kapasitasTangki, sisaLiter, emisi, pct };
+    return { jarakIsi, volumeExact, volumeBulat, biaya, kapasitasTangki, sisaLiter, emisi, remainingPercentage };
   }
 
   function updateChips(groupSelector, dataKey, activeValue) {
@@ -785,9 +786,9 @@
     }
 
     const result = calculate(values);
-    rangeFill.style.width = result.pct + '%';
-    rangeHint.textContent = `Perlu mengisi ${result.jarakIsi.toFixed(0)} km · Sisa ${result.pct.toFixed(0)}% kapasitas`;
-    gaugePct.textContent = result.pct.toFixed(0);
+    rangeFill.style.width = result.remainingPercentage + '%';
+    rangeHint.textContent = `Perlu mengisi ${result.jarakIsi.toFixed(0)} km · Sisa ${result.remainingPercentage.toFixed(0)}% kapasitas`;
+    gaugePct.textContent = result.remainingPercentage.toFixed(0);
     gaugeHint.textContent = `Perkiraan kapasitas tangki ${result.kapasitasTangki.toFixed(1)} L, sisa ${result.sisaLiter.toFixed(1)} L.`;
     document.getElementById('previewKm').textContent = result.jarakIsi.toFixed(0) + ' km';
     document.getElementById('previewLiter').textContent = result.volumeBulat + ' L';
@@ -795,10 +796,10 @@
   }
 
   function buildAdvice(result) {
-    if (result.pct <= 20) {
+    if (result.remainingPercentage <= 20) {
       return 'Prioritas isi BBM sekarang karena sisa kapasitas sudah rendah. Pembulatan liter membantu memberi cadangan aman.';
     }
-    if (result.pct >= 70) {
+    if (result.remainingPercentage >= 70) {
       return 'Sisa BBM masih aman. Pengisian bisa ditunda atau disesuaikan dengan rute operasional berikutnya.';
     }
     return 'Kondisi BBM cukup ideal. Gunakan estimasi biaya ini untuk menyiapkan anggaran perjalanan.';
